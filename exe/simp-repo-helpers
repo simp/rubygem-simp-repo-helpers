@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require "simp/repo/helpers"
+require "simp/repo/helpers/dnf_repo"
+
+MODULAR_REPOS={
+  'mnt' => '/mnt',
+  'simp' => 'https://download.simp-project.com/SIMP/yum/releases/latest/el/7/x86_64/simp',
+  'epel-modular' => 'https://dl.fedoraproject.org/pub/epel/8/Modular/x86_64/',
+  'appstream' => 'http://mirror.centos.org/centos/8/AppStream/x86_64/os',
+}
+
+MODULAR_REPOS.each do |repo_label,url|
+  puts "== url: '#{url}'"
+  repo_url = url.sub(%r[/$],'')
+  modularity_data = Simp::Repo::Helpers::DnfRepo.fetch_modularity(repo_url, repo_label)
+  unless modularity_data
+    warn( "  !! skipping '#{repo_url}'" )
+    next
+  end
+
+  puts modularity_data
+
+  # TODO: slim modulemd and modulemd-defaults entries based on required
+  #       rpms
+end
+
+puts 'FINIS'
